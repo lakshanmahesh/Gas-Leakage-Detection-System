@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Setup - Gas Leak Monitoring</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="setup.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+
+<body>
+  <div class="setup-container">
+    <header class="setup-header">
+      <h1>⚙️ System Setup</h1>
+      <button id="back-btn" class="back-btn"> Back to Dashboard</button>
+    </header>
+
+    <div class="setup-content">
+      <!-- Step 1: Basic Configuration -->
+      <div class="setup-step active" id="step1">
+        <h2>Step 1: Basic Configuration</h2>
+        <div class="form-group">
+          <label for="esp-count">Number of ESP Modules:</label>
+          <input type="number" id="esp-count" min="1" max="10" value="2">
+        </div>
+        <div class="form-group">
+          <label for="sensors-per-esp">Number of MQ6 Sensors per ESP (Max 5):</label>
+          <input type="number" id="sensors-per-esp" min="1" max="5" value="2">
+        </div>
+        <div class="form-group">
+          <label>ESP Module Configuration:</label>
+          <div id="esp-config-container">
+            <!-- Dynamic ESP configuration will be added here -->
+          </div>
+        </div>
+        <button id="next-step1" class="next-btn">Next: Create Flowchart</button>
+      </div>
+
+      <!-- Step 2: Flowchart Drawing -->
+      <div class="setup-step" id="step2">
+        <h2>Step 2: Create Floor Plan & Mark Sensor Locations</h2>
+        <div class="drawing-controls">
+          <div class="tool-group">
+            <button id="draw-mode" class="tool-btn">✏️ Free Draw</button>
+            <button id="line-mode" class="tool-btn active"> Line</button>
+            <button id="half-curve-mode" class="tool-btn"> Half Curve</button>
+            <button id="full-curve-mode" class="tool-btn"> Full Curve</button>
+            <button id="sensor-mode" class="tool-btn">📍 Place Sensor</button>
+            <button id="erase-mode" class="tool-btn"> Erase</button>
+          </div>
+
+          <div class="tool-group">
+            <button id="select-mode" class="tool-btn">Select and Change Shape</button>
+            <button id="vertex-mode" class="tool-btn">Edit Vertex</button>
+          </div>
+
+          <div class="tool-group">
+            <button id="undo-btn" class="tool-btn" title="Undo (Ctrl+Z)">↶ Undo</button>
+            <button id="redo-btn" class="tool-btn" title="Redo (Ctrl+Y)">↷ Redo</button>
+            <button id="clear-canvas" class="tool-btn">🧹 Clear Canvas</button>
+            <button id="reset-all" class="tool-btn reset-all-btn">🔄 Reset All</button>
+          </div>
+
+          <div class="tool-group">
+            <select id="line-width">
+              <option value="2">Thin</option>
+              <option value="4" selected>Medium</option>
+              <option value="6">Thick</option>
+            </select>
+            <input type="color" id="line-color" value="#000000">
+          </div>
+        </div>
+
+        <div class="canvas-container">
+          <div class="canvas-wrapper">
+            <div class="canvas-instructions">
+              <p><strong>Instructions:</strong></p>
+              <ul>
+                <li>Use drawing tools to create your floor plan</li>
+                <li>Click "Place Sensor" and then click on the canvas to position each sensor</li>
+                <li>Each ESP module can have different number of sensors (max 5 per ESP)</li>
+                <li>Use undo/redo to correct mistakes</li>
+              </ul>
+            </div>
+            <canvas id="flowchart-canvas" width="800" height="600"></canvas>
+          </div>
+          <div class="sensor-legend">
+            <h3>Sensor Legend</h3>
+            <div id="sensor-legend-content">
+              <!-- Sensor legend will be populated here -->
+            </div>
+          </div>
+        </div>
+
+        <div class="step-buttons">
+          <button id="prev-step2" class="prev-btn">Previous</button>
+          <button id="next-step2" class="next-btn">Next: Review & Save</button>
+        </div>
+      </div>
+
+      <!-- Step 3: Review and Save -->
+      <div class="setup-step" id="step3">
+        <h2>Step 3: Review Configuration</h2>
+        <div class="review-section">
+          <h3>System Configuration:</h3>
+          <div id="config-summary"></div>
+
+          <h3>Flowchart Preview:</h3>
+          <div class="flowchart-preview">
+            <canvas id="preview-canvas" width="400" height="300"></canvas>
+          </div>
+        </div>
+
+        <div class="step-buttons">
+          <button id="prev-step3" class="prev-btn">Previous</button>
+          <button id="save-config" class="save-btn">💾 Save Configuration</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="setup.js"></script>
+</body>
+
+</html>

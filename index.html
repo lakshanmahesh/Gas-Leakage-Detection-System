@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gas Leak Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+  <body>
+    <div class="header">
+      <h1> Gas Leak Monitoring Dashboard</h1>
+      <div id="setup-section" class="setup-section">
+        <button id="setup-btn" class="setup-btn">⚙️ System Setup</button>
+        <button id="reset-config-btn" class="reset-btn">🔄 Reset Configuration</button>
+      </div>
+    </div>
+
+    <!-- Main Dashboard (hidden initially) -->
+    <div id="dashboard" class="dashboard" style="display: none;">
+      <!-- Dashboard Tabs -->
+      <div class="dashboard-tabs">
+        <button class="tab-btn active" data-tab="readings">📊 Real-time Readings</button>
+        <button class="tab-btn" data-tab="floorplan">🏢 Floor Plan</button>
+        <button class="tab-btn" data-tab="analysis">📈 Analysis</button>
+      </div>
+
+      <!-- Real-time Readings Tab -->
+      <div id="readings-tab" class="tab-content active">
+        <div class="readings-header">
+          <h2>Real-time Gas Sensor Readings</h2>
+          <div class="system-status">
+            <span class="status-indicator" id="system-status"></span>
+            <span id="system-status-text">System Online</span>
+            <span class="last-update" id="last-update">Last Update: --</span>
+          </div>
+        </div>
+        <div class="sensor-container" id="sensor-container">
+          <!-- Dynamic sensors will be added here -->
+        </div>
+      </div>
+
+      <!-- Floor Plan Tab -->
+      <div id="floorplan-tab" class="tab-content">
+        <div class="floorplan-header">
+          <h2>Floor Plan & Sensor Locations</h2>
+          <div class="floorplan-status">
+            <span class="highlighting-status" id="highlighting-status">🟢 Waiting for sensor data...</span>
+          </div>
+          <div class="floorplan-controls">
+            <button id="reset-view" class="control-btn">Reset View</button>
+            <button id="clear-highlighting" class="control-btn">Clear Highlighting</button>
+          </div>
+        </div>
+        <div class="floorplan-container">
+          <canvas class="floorplan-canvas" id="floorplan-canvas" width="800" height="600">
+            <!-- Floor plan will be rendered here -->
+          </canvas>
+          <div class="sensor-legend">
+            <h3>Sensor Legend</h3>
+            <div id="floorplan-legend"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analysis Tab -->
+      <div id="analysis-tab" class="tab-content">
+        <div class="analysis-header">
+          <h2>Gas Level Analysis & Trends</h2>
+          <div class="time-range-selector">
+            <select id="time-range">
+              <option value="1h">Last Hour</option>
+              <option value="6h">Last 6 Hours</option>
+              <option value="24h" selected>Last 24 Hours</option>
+              <option value="7d">Last 7 Days</option>
+            </select>
+          </div>
+        </div>
+        <div class="analysis-content">
+          <div class="analysis-cards">
+            <div class="analysis-card">
+              <h3>Current Status</h3>
+              <div class="status-summary" id="status-summary">
+                <!-- Status summary will be populated here -->
+              </div>
+            </div>
+            <div class="analysis-card">
+              <h3>Peak Readings</h3>
+              <div class="peak-readings" id="peak-readings">
+                <!-- Peak readings will be populated here -->
+              </div>
+            </div>
+            <div class="analysis-card">
+              <h3>Alert History</h3>
+              <div class="alert-history" id="alert-history">
+                <!-- Alert history will be populated here -->
+              </div>
+            </div>
+          </div>
+          <div class="charts-container">
+            <div class="chart-card">
+              <h3>Gas Level Trends</h3>
+              <canvas id="trend-chart" width="800" height="300"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>

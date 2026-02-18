@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Debug</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+    .status { padding: 10px; margin: 5px 0; border-radius: 5px; }
+    .success { background-color: #d4edda; color: #155724; }
+    .error { background-color: #f8d7da; color: #721c24; }
+    .warning { background-color: #fff3cd; color: #856404; }
+    button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+    .sensor-display { display: inline-block; margin: 10px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+</head>
+<body>
+  <h1>Gas Detector Dashboard Debug</h1>
+  
+  <div class="debug-section">
+    <h2>Firebase Connection Test</h2>
+    <div id="firebase-status" class="status">Testing Firebase connection...</div>
+    <button onclick="testFirebaseConnection()">Test Firebase Connection</button>
+  </div>
+  
+  <div class="debug-section">
+    <h2>Sensor Data Test</h2>
+    <div id="sensor-status" class="status">Waiting for sensor data...</div>
+    <button onclick="testSensorData()">Test Sensor Data</button>
+    <button onclick="writeTestData()">Write Test Data</button>
+  </div>
+  
+  <div class="debug-section">
+    <h2>Live Sensor Readings</h2>
+    <div class="sensor-display">
+      <h3>ESP1_Sensor1</h3>
+      <div id="sensor1-value">--</div>
+      <div id="sensor1-status">Disconnected</div>
+    </div>
+    <div class="sensor-display">
+      <h3>ESP1_Sensor2</h3>
+      <div id="sensor2-value">--</div>
+      <div id="sensor2-status">Disconnected</div>
+    </div>
+  </div>
+  
+  <div class="debug-section">
+    <h2>Console Logs</h2>
+    <div id="console-logs" style="background: #f8f9fa; padding: 10px; height: 200px; overflow-y: auto; font-family: monospace; font-size: 12px;"></div>
+  </div>
+
+  <script>
+    // Firebase Config (same as main dashboard)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD03uzNrXqHT-Qek7FxnolduX6duze185k",
+      databaseURL: "https://gas-leakage-detection-sy-41697-default-rtdb.europe-west1.firebasedatabase.app/",
+    };
+
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Console logging function
+    function log(message) {
+      console.log(message);
+      const logsDiv = document.getElementById('console-logs');
+      const timestamp = new Date().toLocaleTimeString();
+      logsDiv.innerHTML += `[${timestamp}] ${message}<br>`;
+      logsDiv.scrollTop = logsDiv.scrollHeight;
+    }
+
+    // Test Firebase connection
+    function testFirebaseConnection() {
+      log('Testing Firebase connection...');
+      const statusDiv = document.getElementById('firebase-status');
+      
+      // Test connection
+      const connectedRef = db.ref('.info/connected');
+      connectedRef.on('value', (snapshot) => {
+        const isConnected = snapshot.val();
+        if (isConnected) {
+          statusDiv.textContent = '✅ Firebase Connected Successfully';
+          statusDiv.className = 'status success';
+          log('Firebase connection: SUCCESS');
+        } else {
+          statusDiv.textContent = '❌ Firebase Connection Failed';
+          statusDiv.className = 'status error';
+          log('Firebase connection: FAILED');
+        }
+      });
+    }
+
+    // Test sensor data reading
+    function testSensorData() {
+      log('Testing sensor data reading...');
+      const statusDiv = document.getElementById('sensor-status');
+      
+      // Test reading from both sensor paths
+      const sensor1Ref = db.ref('gas/sensor1');
+      const sensor2Ref = db.ref('gas/sensor2');
+      
+      sensor1Ref.once('value', (snapshot) => {
+        const data1 = snapshot.val();
+        log(`Sensor 1 data: ${data1}`);
+        
+        sensor2Ref.once('value', (snapshot) => {
+          const data2 = snapshot.val();
+          log(`Sensor 2 data: ${data2}`);
+          
+          if (data1 !== null || data2 !== null) {
+            statusDiv.textContent = '✅ Sensor data found';
+            statusDiv.className = 'status success';
+          } else {
+            statusDiv.textContent = '⚠️ No sensor data found (ESP32 may not be connected)';
+            statusDiv.className = 'status warning';
+          }
+        });
+      });
+    }
+
+    // Write test data
+    function writeTestData() {
+      log('Writing test data to Firebase...');
+      
+      // Write test values
+      db.ref('gas/sensor1').set(1200);
+      db.ref('gas/sensor2').set(800);
+      
+      log('Test data written: sensor1=1200, sensor2=800');
+    }
+
+    // Set up real-time listeners
+    function setupRealtimeListeners() {
+      log('Setting up real-time listeners...');
+      
+      // Listen to sensor 1
+      db.ref('gas/sensor1').on('value', (snapshot) => {
+        const value = snapshot.val();
+        const valueDiv = document.getElementById('sensor1-value');
+        const statusDiv = document.getElementById('sensor1-status');
+        
+        if (value !== null) {
+          valueDiv.textContent = `${value} ppm`;
+          statusDiv.textContent = value > 1300 ? 'Critical' : value > 1000 ? 'Warning' : 'Normal';
+          statusDiv.className = value > 1300 ? 'error' : value > 1000 ? 'warning' : 'success';
+          log(`Sensor 1 updated: ${value} ppm`);
+        } else {
+          valueDiv.textContent = '--';
+          statusDiv.textContent = 'Disconnected';
+          statusDiv.className = '';
+        }
+      });
+      
+      // Listen to sensor 2
+      db.ref('gas/sensor2').on('value', (snapshot) => {
+        const value = snapshot.val();
+        const valueDiv = document.getElementById('sensor2-value');
+        const statusDiv = document.getElementById('sensor2-status');
+        
+        if (value !== null) {
+          valueDiv.textContent = `${value} ppm`;
+          statusDiv.textContent = value > 1300 ? 'Critical' : value > 1000 ? 'Warning' : 'Normal';
+          statusDiv.className = value > 1300 ? 'error' : value > 1000 ? 'warning' : 'success';
+          log(`Sensor 2 updated: ${value} ppm`);
+        } else {
+          valueDiv.textContent = '--';
+          statusDiv.textContent = 'Disconnected';
+          statusDiv.className = '';
+        }
+      });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      log('Debug page loaded');
+      testFirebaseConnection();
+      setupRealtimeListeners();
+    });
+  </script>
+</body>
+</html>
+

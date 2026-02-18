@@ -1,0 +1,30 @@
+{
+  "name": "gas-leakage-monitoring-system",
+  "version": "1.0.0",
+  "description": "Gas leakage monitoring system with ESP modules and MQ6 sensors",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.3",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "firebase-admin": "^11.11.1",
+    "fs": "^0.0.1-security",
+    "multer": "^1.4.5-lts.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  },
+  "keywords": [
+    "gas-detection",
+    "esp32",
+    "mq6-sensor",
+    "monitoring",
+    "dashboard"
+  ],
+  "author": "Gas Monitoring System",
+  "license": "MIT"
+}
